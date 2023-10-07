@@ -72,8 +72,8 @@ class CrawlingService(DHTDispatcher):
 
             self.routing_table.max_size = self.routing_table.max_size * 101 // 100
 
-            logging.debug(f"Max number of neighbors is {self.routing_table.max_size}")
-            logger.info(f"Active tasks: {len(asyncio.Task.all_tasks())}")
+            # logging.debug(f"Max number of neighbors is {self.routing_table.max_size}")
+            # logger.info(f"Active tasks: {len(asyncio.Task.all_tasks())}")
 
     def on_announce_peer(
         self, tid: bytes, nid: bytes, info_hash: bytes, address: Tuple[str, int]
@@ -84,7 +84,7 @@ class CrawlingService(DHTDispatcher):
             nid=dht_utils.generate_neighbor_nid(self.node.nid, nid),
             address=address,
         )
-        logger.debug(f"On announce peer, infohash {info_hash.hex()}")
+        # logger.debug(f"On announce peer, infohash {info_hash.hex()}")
 
         if not Torrent.exists(info_hash):
             self.metadata_fetcher.fetch(info_hash, address)
@@ -116,7 +116,7 @@ class CrawlingService(DHTDispatcher):
         self.rpc.respond_get_peers(
             tid=tid, info_hash=info_hash, nid=self.node.nid, address=address
         )
-        logger.debug(f"On get peers, infohash {info_hash.hex()}")
+        # logger.debug(f"On get peers, infohash {info_hash.hex()}")
 
     def on_metadata_result(self, info_hash: bytes, metadata: bytes) -> None:
         """Received metadata (aka torrent info), decode it and store in db"""
