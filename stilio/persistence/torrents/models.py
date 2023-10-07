@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime as dt
 from typing import List, Tuple
+from playhouse.mysql_ext import Match
 
 from peewee import (
     BigIntegerField,
@@ -10,24 +11,17 @@ from peewee import (
     IntegerField,
     TextField,
 )
-from playhouse.postgres_ext import Match, TSVectorField
 
 from stilio.persistence.database import BaseModel
 
 
 class Torrent(BaseModel):
-    info_hash = CharField(max_length=40, unique=True)
-
+    info_hash = CharField(max_length=40, primary_key=True)
     name = CharField(max_length=512)
-    search_name = TSVectorField()
-
     seeders = IntegerField(default=0)
     leechers = IntegerField(default=0)
-
     files = TextField()
-
     size = BigIntegerField()
-
     added_at = DateTimeField(default=dt.datetime.now)
 
     def __str__(self):
@@ -48,9 +42,10 @@ class Torrent(BaseModel):
     ) -> Tuple[List["Torrent"], int]:
         # Remove characters that are not considered a "letter"
         cleaned_name = "".join([letter for letter in name if letter.isalpha() or " "])
-        # Every word is required so &
-        cleaned_name = cleaned_name.replace(" ", " & ")
-        queryset = cls.select().where(Torrent.search_name.match(cleaned_name))
+        keywords = cleaned_name.split()
+        queryset = cls.select().where(
+            Match(cls.files, ' '.join(f'+"{keyword}"' for keyword in keywords), 'IN BOOLEAN MODE')
+        ).order_by(cls.added_at.desc())
 
         torrent_count = queryset.select().count()
         torrents = (

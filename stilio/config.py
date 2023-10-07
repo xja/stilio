@@ -3,11 +3,11 @@ import os
 
 # Database
 # --------------------------------------------------------
-DATABASE_NAME = os.getenv("POSTGRES_DB")
-DATABASE_HOST = os.getenv("POSTGRES_HOST")
-DATABASE_PORT = os.getenv("POSTGRES_PORT")
-DATABASE_USER = os.getenv("POSTGRES_USER")
-DATABASE_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DATABASE_NAME = os.getenv("MYSQL_DATABASE")
+DATABASE_HOST = os.getenv("MYSQL_HOST")
+DATABASE_PORT = os.getenv("MYSQL_PORT")
+DATABASE_USER = os.getenv("MYSQL_USER")
+DATABASE_PASSWORD = os.getenv("MYSQL_PASSWORD")
 
 # Crawler
 # --------------------------------------------------------

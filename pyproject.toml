@@ -15,10 +15,10 @@ jinja2 = "^2.11.1"
 aiofiles = "^0.4.0"
 peewee = "^3.13.1"
 peewee-async = "^0.7.0"
-aiopg = "^1.0.0"
-psycopg2-binary = "^2.8.4"
 Faker = "^4.0.2"
 ipython = "^7.20.0"
+pymysql = "^1.1.0"
+opencc = "^1.1.6"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"

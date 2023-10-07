@@ -1,10 +1,11 @@
 import json
-
+import opencc
 from peewee import IntegrityError
-from playhouse.postgres_ext import fn
-
 from stilio.persistence.exceptions import StoringError
 from stilio.persistence.torrents.models import Torrent
+
+
+converter = opencc.OpenCC("t2s.json")
 
 
 class FileSystem:
@@ -51,16 +52,19 @@ class FileSystem:
 
 def store_metadata(info_hash: bytes, metadata: dict, logger=None) -> None:
     name = metadata[b"name"].decode("utf-8")
-    search_name = name.replace(".", " ")
     files = get_file_structure(metadata, name)
     size = get_size(metadata)
+    if size <= 0:
+        return
 
     try:
+        files = {name: files["/"]}
+        files = json.dumps(files, ensure_ascii=False)
+        files = converter.convert(files)
         Torrent.insert(
             info_hash=info_hash.hex(),
             name=name,
-            search_name=fn.to_tsvector(search_name),
-            files=json.dumps(files, ensure_ascii=False),
+            files=files,
             size=size,
         ).execute()
     except IntegrityError as e:

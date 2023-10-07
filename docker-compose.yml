@@ -1,8 +1,7 @@
 version: '3'
 
 volumes:
-  local_postgres_data: {}
-  local_postgres_data_backups: {}
+  mysql:
 
 
 services:
@@ -11,7 +10,7 @@ services:
       context: .
       dockerfile: docker/crawler/Dockerfile
     depends_on:
-      - postgres
+      - mysql
     network_mode: "host"
     logging:
       driver: "json-file"
@@ -21,14 +20,14 @@ services:
     env_file:
       - ./.env
     environment:
-      POSTGRES_HOST: "localhost"
+      MYSQL_HOST: "localhost"
 
   frontend:
     build:
       context: .
       dockerfile: docker/frontend/production/Dockerfile
     depends_on:
-      - postgres
+      - mysql
       - crawler
     ports:
       - "80:8000"
@@ -40,16 +39,14 @@ services:
     env_file:
       - ./.env
 
-  postgres:
+  mysql:
     build:
       context: .
       dockerfile: docker/persistence/Dockerfile
-    image: stilio_production_postgres
     volumes:
-      - local_postgres_data:/var/lib/postgresql/data
-      - local_postgres_data_backups:/backups
+      - mysql:/var/lib/mysql
     ports:
-      - "5432:5432"
+      - "3306:3306"
     logging:
       driver: "json-file"
       options:

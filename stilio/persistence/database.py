@@ -1,7 +1,8 @@
 from contextvars import ContextVar
 
 import peewee
-from peewee import Model, PostgresqlDatabase
+from peewee import Model, MySQLDatabase
+from playhouse.migrate import *
 
 from stilio.config import (
     DATABASE_HOST,
@@ -27,10 +28,10 @@ class PeeweeConnectionState(peewee._ConnectionState):
         return self._state.get()[name]
 
 
-db = PostgresqlDatabase(
+db = MySQLDatabase(
     DATABASE_NAME,
     host=DATABASE_HOST,
-    port=DATABASE_PORT,
+    port=int(DATABASE_PORT),
     user=DATABASE_USER,
     password=DATABASE_PASSWORD,
     autorollback=True,
@@ -49,5 +50,11 @@ def init() -> None:
 
     db.connect(reuse_if_open=True)
     db.create_tables(MODELS)
+    # db.execute_sql("ALTER DATABASE `stilio` CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_520_ci;")
+    db.execute_sql("ALTER TABLE `torrent` ENGINE=Mroonga;")
+    try:
+        db.execute_sql("ALTER TABLE `torrent` ADD FULLTEXT INDEX `files` (`files`);")
+    except peewee.OperationalError:
+        pass
     if not db.is_closed():
         db.close()

@@ -1,7 +1,6 @@
 from uuid import uuid4
 
 from faker import Faker
-from playhouse.postgres_ext import fn
 
 from stilio.persistence import database
 from stilio.persistence.database import db
@@ -16,7 +15,6 @@ def create_fake_data() -> None:
         torrent_id = Torrent.insert(
             info_hash=uuid4(),
             name=name,
-            search_name=fn.to_tsvector(name),
             size="",
             files="",
         ).execute()
